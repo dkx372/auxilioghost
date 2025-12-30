@@ -7,14 +7,13 @@
 
 <style>
 :root{
-  --bg:#000000;
   --panel:#0d0d10;
-  --accent:#2563eb; /* AZUL */
+  --accent:#2563eb;
   --text:#f8fafc;
   --mono:ui-monospace,SFMono-Regular,monospace;
 }
 
-*{box-sizing:border-box;}
+*{box-sizing:border-box}
 
 body{
   margin:0;
@@ -38,14 +37,12 @@ body{
   box-shadow:0 0 25px rgba(37,99,235,.35), inset 0 0 20px #000;
   border:1px solid rgba(37,99,235,.55);
   text-align:center;
-  animation:fadeUp .6s ease;
 }
 
 .login-box h1{
   margin-top:0;
   font-size:26px;
   color:var(--accent);
-  text-shadow:0 0 12px rgba(37,99,235,.9);
 }
 
 .login-box input{
@@ -70,17 +67,10 @@ body{
   font-size:16px;
   font-weight:700;
   cursor:pointer;
-  transition:.25s;
-  box-shadow:0 0 15px rgba(37,99,235,.6);
-}
-
-.login-btn:hover{
-  transform:scale(1.05);
-  box-shadow:0 0 25px rgba(37,99,235,1);
 }
 
 /* PAINEL */
-#painel{display:none;}
+#painel{display:none}
 
 .panel{
   width:100%;
@@ -91,13 +81,11 @@ body{
   box-shadow:0 0 25px rgba(37,99,235,.35), inset 0 0 20px #000;
   border:1px solid rgba(37,99,235,.55);
   margin-top:20px;
-  animation:fadeUp .6s ease;
 }
 
 h2{
   text-align:center;
   color:var(--accent);
-  text-shadow:0 0 12px rgba(37,99,235,.9);
 }
 
 label{
@@ -131,12 +119,6 @@ input[type="text"],input[type="number"]{
   color:#fff;
   font-weight:700;
   cursor:pointer;
-  box-shadow:0 0 15px rgba(37,99,235,.6);
-  transition:.25s;
-}
-
-.btn:hover{
-  transform:scale(1.05);
 }
 
 .btn.sec{
@@ -168,11 +150,6 @@ input[type="text"],input[type="number"]{
   max-height:160px;
   overflow:auto;
 }
-
-@keyframes fadeUp{
-  from{opacity:0;transform:translateY(20px);}
-  to{opacity:1;transform:translateY(0);}
-}
 </style>
 </head>
 <body>
@@ -201,17 +178,6 @@ input[type="text"],input[type="number"]{
     <label>Tamanho</label>
     <input type="number" id="tamanho" value="12">
 
-    <div style="display:flex;gap:10px;margin-top:10px;">
-      <label><input type="checkbox" id="sendMockapi" checked> MockAPI</label>
-      <label><input type="checkbox" id="sendWebhook"> Webhook</label>
-    </div>
-
-    <label>MockAPI URL</label>
-    <input type="text" id="mockapiUrl" placeholder="https://xxxx.mockapi.io/keys">
-
-    <label>Webhook URL</label>
-    <input type="text" id="webhookUrl">
-
     <div class="actions">
       <button class="btn" id="btnGerar">Gerar</button>
       <button class="btn sec" id="btnCopiar">Copiar</button>
@@ -224,68 +190,43 @@ input[type="text"],input[type="number"]{
 </div>
 
 <script>
-const SENHA_CORRETA="ghostx";
+/* ===== SENHA CORRETA ===== */
+const SENHA_CORRETA = "GHOSTXITER@23";
 
-loginBtn.onclick=()=>{
-  if(senha.value===SENHA_CORRETA){
-    loginBox.style.display="none";
-    painel.style.display="block";
-  }else alert("Senha incorreta");
+/* ===== LOGIN ===== */
+loginBtn.onclick = () => {
+  if (senha.value === SENHA_CORRETA) {
+    loginBox.style.display = "none";
+    painel.style.display = "block";
+  } else {
+    alert("Senha incorreta");
+    senha.value = "";
+  }
 };
 
+/* ===== GERADOR ===== */
 const chars="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 const logEl=document.getElementById("log");
 const keysBox=document.getElementById("keysBox");
 
 function gerarKey(size,prefix,dia){
   let k="";
-  for(let i=0;i<size;i++)k+=chars[Math.floor(Math.random()*chars.length)];
+  for(let i=0;i<size;i++) k+=chars[Math.floor(Math.random()*chars.length)];
   return `${prefix}${dia}${k}`;
 }
 
-function log(t){logEl.textContent+=t+"\n";}
-
-async function enviarMock(url,obj){
-  try{
-    const r=await fetch(url,{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify(obj)
-    });
-    log("MockAPI ➜ "+r.status);
-  }catch(e){log("Erro MockAPI");}
-}
-
-btnGerar.onclick=async()=>{
+btnGerar.onclick=()=>{
   logEl.textContent="";
-  const prefixVal=prefix.value.trim();
-  const diaVal=dia.value.trim();
-  const qtd=+quantidade.value;
-  const size=+tamanho.value;
-
-  if(!prefixVal||!diaVal)return alert("Preencha prefixo e dia");
-
   const lista=[];
-  for(let i=0;i<qtd;i++)lista.push(gerarKey(size,prefixVal,diaVal));
-
-  keysBox.textContent=lista.join("\n");
-  log("Geradas: "+lista.length);
-
-  if(sendMockapi.checked && mockapiUrl.value){
-    await Promise.all(lista.map(k=>enviarMock(mockapiUrl.value,{
-      key:k,
-      status:"ativa",
-      createdAt:new Date().toISOString(),
-      dia:diaVal
-    })));
+  for(let i=0;i<quantidade.value;i++){
+    lista.push(gerarKey(tamanho.value,prefix.value,dia.value));
   }
-
-  log("✔ Finalizado");
+  keysBox.textContent=lista.join("\n");
+  logEl.textContent="✔ Keys geradas: "+lista.length;
 };
 
 btnCopiar.onclick=async()=>{
   await navigator.clipboard.writeText(keysBox.textContent);
-  alert("Copiado!");
 };
 
 btnDownload.onclick=()=>{
